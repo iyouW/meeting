@@ -1,5 +1,5 @@
-import { IMFactory } from '../core/factories/imFactory';
-import { RTCFactory } from '../core/factories/rtcFactory';
+import { IMFactory } from '../core/lib/im/imFactory';
+import { RTCFactory } from '../core/lib/rtc/rtcFactory';
 
 export const state = {
     user:'',
