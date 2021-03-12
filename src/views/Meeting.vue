@@ -97,7 +97,7 @@ export default {
       #s_1{
         display: inline-block;
         width: 800px;
-        height: 800px;
+        height: 800pkx;
       }
     }
 
