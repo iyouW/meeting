@@ -2,15 +2,30 @@ import TIM from 'tim-js-sdk';
 
 export class IMClient{
 
-    constructor(sdkAppId,secret){
-        this._skdAppId = sdkAppId;
-        this._secret = secret;
-        this._client = TIM.create({SDKAppID: this._skdAppId});
+    static Expire(){
+        return 1000*60*60*24*5;
     }
 
-    loginAsync(userId, userSig){
+    constructor(sdkAppId, secret, cryptoProvider){
+        this._sdkAppId = sdkAppId;
+        this._secret = secret;
+        this._crytoProvider = cryptoProvider;
+
+        this._client = TIM.create({SDKAppID: this._sdkAppId});
+
+        this._userId;
+    }
+
+    loginAsync(userId){
+        this._userId = userId;
+        const userSig = this._crytoProvider.generateTxUserSig(
+            this._secret,
+            this._sdkAppId,
+            this._userId,
+            IMClient.Expire()
+        )
         return this._client.login({
-            userID: userId,
+            userID: this._userId,
             userSig
         });
     }
@@ -21,6 +36,7 @@ export class IMClient{
             joinOption = TIM.TYPES.JOIN_OPTIONS_FREE_ACCESS){
         return this._client.createGroup({
             groupId,
+            name: groupId,
             type,
             joinOption
         })

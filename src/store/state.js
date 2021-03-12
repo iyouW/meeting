@@ -1,9 +1,5 @@
-import { IMFactory } from '../core/lib/im/imFactory';
-import { RTCFactory } from '../core/lib/rtc/rtcFactory';
+import { MeetingFactory } from '../core/meeting/meetingFactory';
 
 export const state = {
-    user:'',
-    room:'',
-    im: IMFactory.create(),
-    rtc: RTCFactory.create()
+    meeting: MeetingFactory.Create()
 };

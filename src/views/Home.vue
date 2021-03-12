@@ -3,13 +3,13 @@
     <section>
       <label>
         姓名:
-        <input type="text" v-model="user"/>
+        <input type="text" v-model="meeting.userId"/>
       </label>
     </section>
     <section>
       <label>
         房间号:
-        <input type="text" v-model="room"/>
+        <input type="text" v-model="meeting.roomId"/>
       </label>
     </section>
     <section>
@@ -19,30 +19,15 @@
 </template>
 
 <script>
-import {mapGetters, mapMutations } from 'vuex';
+import {mapGetters } from 'vuex';
 
 export default {
-    data(){
-      return{
-        user:'31_meeting_test_1',
-        userSig:'eJwtzUELgkAQBeD-sueQWZ0tFTrlIaqTFXST0MmG1HQdtIj*e6Ye53uPNx91OhydjqwKleuAWow3Z1QJ33hkTyclkXCVJ0KtJHoutdnjWtecqVAjAAYYeGZK6FWzpcGNMS4ATCpc-m2pDRp0IZhXOB9*YEyFvZ8zjI0U3aqPfHnnzUVL1O761E*brcU9xLixz7X6-gAVLzZB',
-        room:888999
-      }
-    },
     computed:{
-      ...mapGetters(['im','rtc'])
+      ...mapGetters(['meeting'])
     },
     methods:{
-      ...mapMutations(['changeUser','changeRoom']),
       async enter(){
-        this.im.onReady(async () =>
-        {
-          await this.im.createGroupAsync(this.room);
-          await this.im.joinGroupAsync(this.room);
-        });
-        await this.im.loginAsync(this.user, this.userSig);
-        await this.rtc.loginAsync(this.user, this.userSig);
-        await this.rtc.joinAsync(this.room);
+        await this.meeting.startAsync();
         this.$router.push("/meeting");
       }
     }

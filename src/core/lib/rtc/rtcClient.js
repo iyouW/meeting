@@ -3,9 +3,15 @@ import { TRTC_TYPES } from './rtcTypes';
 
 export class RTCClient{
 
-    constructor(sdkAppId,secret){
+    static Expire(){
+        return 1000*60*60*24*5;
+    }
+
+    constructor(sdkAppId,secret, cryptoProvider){
         this._sdkAppId = sdkAppId;
         this._secret = secret;
+        this._cryptoProvider = cryptoProvider;
+
         this._audioDevices = [];
         this._videoDevices = [];
         this._client;
@@ -30,14 +36,20 @@ export class RTCClient{
         return this._client.setProxyServer(proxy);
     }
 
-    loginAsync(user, userSig, mode = TRTC_TYPES.MODE.RTC){
+    loginAsync(userId, mode = TRTC_TYPES.MODE.RTC){
         return new Promise((resolve,reject)=>{
             try {
-                this._userId = user;
+                this._userId = userId;
+                const userSig = this._cryptoProvider.generateTxUserSig(
+                    this._secret,
+                    this._sdkAppId,
+                    this._userId,
+                    RTCClient.Expire())
+                
                 this._client = TRTC.createClient({
                     mode,
                     sdkAppId:this._sdkAppId,
-                    userId:user,
+                    userId,
                     userSig
                 });
                 resolve();
@@ -66,12 +78,13 @@ export class RTCClient{
         return this._client.unpublish(stream);
     }
 
-    createStreamAsync(userId){
+    createStreamAsync(){
         this._localStream = TRTC.createStream({
-            userId,
+            userId:this._userId,
             audio:true,
             video:true
         });
+        return this._localStream;
     }
 
 }
