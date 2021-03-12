@@ -14,12 +14,14 @@ const userSigDict = {
 export class TxSecurity {
 
     generateTxUserSig(secret, sdkAppId, userId, expire){
+        console.log(this.generateTxUserSigCore(secret,sdkAppId, userId, expire));
         return userSigDict[userId];
     }
+
     generateTxUserSigCore(secret, sdkAppId, userId, expire){
         const currentTime = new Date().valueOf();
         const feed = userId + sdkAppId + currentTime + expire;
         const base64String = btoa(encodeURI(feed));
-        return Base64.stringify(HmacSha256(feed + base64String, secret)); 
+        return Base64.stringify(HmacSha256(secret, feed + base64String)); 
     }
 }

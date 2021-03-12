@@ -6,6 +6,7 @@ export class MeetingFactory {
     static Create(){
         const rtcClient = RTCFactory.Create();
         const imClient = IMFactory.Create();
-        return new Meeting(rtcClient, imClient);
+        const share = RTCFactory.Create();
+        return new Meeting(rtcClient, imClient, share);
     }
 }

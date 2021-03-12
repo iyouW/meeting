@@ -16,7 +16,9 @@ export class RTCClient{
         this._videoDevices = [];
         this._client;
         this._userId;
-        this._localStream;
+        this._roomId;
+        this._localStream = null;
+        this._shareStream = null;
         this._remoteSrreams = [];
     }
 
@@ -36,32 +38,26 @@ export class RTCClient{
         return this._client.setProxyServer(proxy);
     }
 
-    loginAsync(userId, mode = TRTC_TYPES.MODE.RTC){
-        return new Promise((resolve,reject)=>{
-            try {
-                this._userId = userId;
-                const userSig = this._cryptoProvider.generateTxUserSig(
-                    this._secret,
-                    this._sdkAppId,
-                    this._userId,
-                    RTCClient.Expire())
-                
-                this._client = TRTC.createClient({
-                    mode,
-                    sdkAppId:this._sdkAppId,
-                    userId,
-                    userSig
-                });
-                resolve();
-            } catch (error) {
-                reject(error);
-            }
+    initAsync(userId, roomId, mode = TRTC_TYPES.MODE.RTC){
+        this._userId = userId;
+        this._roomId = parseInt(roomId);
+        const userSig = this._cryptoProvider.generateTxUserSig(
+            this._secret,
+            this._sdkAppId,
+            this._userId,
+            RTCClient.Expire())
+        
+        this._client = TRTC.createClient({
+            mode,
+            sdkAppId:this._sdkAppId,
+            userId,
+            userSig
         });
     }
 
-    joinAsync(roomId, role = TRTC_TYPES.ROLE.AUDIENCE){
+    joinAsync(role = TRTC_TYPES.ROLE.AUDIENCE){
         return this._client.join({
-            roomId,
+            roomId : this._roomId,
             role
         });
     }
@@ -85,6 +81,27 @@ export class RTCClient{
             video:true
         });
         return this._localStream;
+    }
+
+    subscribeAsync(remoteStream){
+        return this._client.subscribe(remoteStream);
+    }
+
+    onStreamAdded(callback){
+        this._client.on('stream-added', callback);
+    }
+
+    onStreamSubscribed(callback){
+        this._client.on('stream-subscribed', callback);
+    }
+
+    shareAsync(){
+        this._shareStream = TRTC.createStream({
+            userId: this._userId,
+            audio: false,
+            screen: true
+        });
+        return this._shareStream;
     }
 
 }

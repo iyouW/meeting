@@ -27,7 +27,6 @@ export default {
     },
     methods:{
       async enter(){
-        await this.meeting.startAsync();
         this.$router.push("/meeting");
       }
     }
